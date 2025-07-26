@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Identification des Roches</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Identification des Roches</h1>
+  </header>
+
+  <main>
+    <div id="accueil">
+      <h2>Choisissez un mode de recherche</h2>
+      <button onclick="afficherRechercheParNom()">Recherche par nom</button>
+      <button onclick="afficherRechercheParElements()">Recherche par éléments</button>
+    </div>
+
+    <div id="recherche-nom" class="hidden">
+      <h2>Recherche par nom</h2>
+      <div class="form-group">
+        <input type="text" id="nomRoche" placeholder="Entrez le nom de la roche...">
+      </div>
+      <button onclick="chercherParNom()">Chercher</button>
+      <div id="resultatNom"></div>
+    </div>
+
+    <div id="recherche-elements" class="hidden">
+      <h2>Recherche par éléments</h2>
+      <form id="form-elements">
+        <div id="elements-inputs"></div>
+        <button type="button" onclick="chercherParElements()">Identifier</button>
+      </form>
+      <div id="resultatElements"></div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
