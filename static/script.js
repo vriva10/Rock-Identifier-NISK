@@ -21,6 +21,37 @@ function afficherRechercheParElements() {
   });
 }
 
+// Recherche par nom : appelle l'API Flask et affiche la composition moyenne
+async function chercherParNom() {
+  const nom = document.getElementById("nomRoche").value.trim().toLowerCase();
+  if (!nom) {
+    alert("Veuillez entrer un nom de roche.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:5000/composition/${nom}`);
+    if (!response.ok) {
+      throw new Error(`Erreur serveur : ${response.status}`);
+    }
+    const data = await response.json();
+    if(data.error){
+      document.getElementById("resultatNom").innerHTML = `<p style="color:red;">${data.error}</p>`;
+      return;
+    }
+    const comp = data.composition_moyenne;
+    let html = `<h3>Composition moyenne pour ${data.roche} :</h3><ul>`;
+    for (const [elem, val] of Object.entries(comp)) {
+      html += `<li>${elem} : ${val} %</li>`;
+    }
+    html += `</ul>`;
+    document.getElementById("resultatNom").innerHTML = html;
+  } catch (err) {
+    document.getElementById("resultatNom").innerHTML = `<p style="color:red;">Erreur lors de la requête : ${err.message}</p>`;
+  }
+}
+
+// Recherche par éléments : appelle l'API Flask /predict_elements et affiche les résultats
 async function chercherParElements() {
   const form = document.getElementById("form-elements");
   const formData = new FormData(form);
@@ -33,7 +64,7 @@ async function chercherParElements() {
   });
 
   try {
-    const response = await fetch("http://localhost:5000/predict", {
+    const response = await fetch("http://localhost:5000/predict_elements", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -48,17 +79,23 @@ async function chercherParElements() {
     const resultats = await response.json();
 
     const div = document.getElementById("resultatElements");
-    if (resultats.length === 0) {
+    if (!resultats || !resultats.roche) {
       div.innerHTML = `<p>Aucune roche correspondante trouvée.</p>`;
       return;
     }
 
-    div.innerHTML = `<h3>Roches les plus probables :</h3><ul>` +
-      resultats.map(r => `<li><strong>${r.roche}</strong> : ${r.probabilite}%</li>`).join('') +
-      `</ul>`;
+    div.innerHTML = `
+      <h3>Roche la plus probable :</h3>
+      <p><strong>${resultats.roche}</strong> : ${resultats.probabilite} %</p>
+      <h4>Composition moyenne :</h4>
+      <ul>
+        ${Object.entries(resultats.composition_moyenne).map(([elem, val]) => `<li>${elem} : ${val} %</li>`).join('')}
+      </ul>
+    `;
 
   } catch (err) {
     console.error("Erreur lors de la requête :", err);
     document.getElementById("resultatElements").innerHTML = `<p style="color:red;">Erreur lors de la requête : ${err.message}</p>`;
   }
 }
+
