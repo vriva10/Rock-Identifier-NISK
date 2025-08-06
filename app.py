@@ -13,7 +13,7 @@ df = pd.read_excel("rock_database_test2_NISK24.xlsx")
 df['Roche'] = df['Roche'].str.strip().str.lower()
 
 # Séparation des features et de la cible
-features = ['Si', 'Ca', 'K', 'Al', 'Mg', 'Fe', 'P', 'Cr', 'Ti', 'S', 'Cu', 'Ni', 'Mn', 'Br', 'V', 'Ba', 'Au', 'Ce']
+features = ['Mg', 'Al', 'Si', 'P', 'S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Ag', 'Ba', 'Ce', 'Au']
 X = df[features]
 y = df['Roche']
 
