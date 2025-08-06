@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
@@ -28,7 +28,7 @@ model.fit(X_scaled, y)
 # Route statique pour l'interface
 @app.route("/")
 def index():
-    return send_from_directory("static", "index.html")
+    return render_template("index.html")
 
 # Pour que le HTML charge les fichiers CSS/JS correctement
 @app.route("/<path:path>")
