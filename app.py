@@ -12,6 +12,9 @@ df = pd.read_excel("rock_database_test2_NISK24.xlsx")
 # Normalisation du nom des roches
 df['Roche'] = df['Roche'].str.strip().str.lower()
 
+# Nettoyage : supprime les lignes contenant des valeurs manquantes
+df.dropna(inplace=True)
+
 # Séparation des features et de la cible
 features = ['Mg', 'Al', 'Si', 'P', 'S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Ag', 'Ba', 'Ce', 'Au']
 X = df[features]
