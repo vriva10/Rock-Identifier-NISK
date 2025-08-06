@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 
 # Chargement des données
-df = pd.read_excel("C:\Users\lenovo\Desktop\rock_database\rock_database_test2_NISK24.xlsx")
+df = pd.read_excel("C:\\Users\\lenovo\\Desktop\\rock_database\\rock_database_test2_NISK24.xlsx")
 
 # Normalisation du nom des roches
 df['Roche'] = df['Roche'].str.strip().str.lower()
