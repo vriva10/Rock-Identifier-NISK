@@ -1,5 +1,5 @@
 // Liste des éléments à afficher dans le formulaire
-const elements = ['Si', 'Ca', 'K', 'Al', 'Mg', 'Fe', 'P', 'Cr', 'Ti', 'S', 'Cu', 'Ni', 'Mn', 'Br', 'V', 'Ba', 'Au', 'Ce'];
+const elements = ['Mg', 'Al', 'Si', 'P', 'S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Ag', 'Ba', 'Ce', 'Au'];
 
 function afficherRechercheParNom() {
   document.getElementById("accueil").classList.add("hidden");
@@ -30,12 +30,12 @@ async function chercherParNom() {
   }
 
   try {
-    const response = await fetch(`http://localhost:5000/composition/${nom}`);
+    const response = await fetch(`/composition/${nom}`);
     if (!response.ok) {
       throw new Error(`Erreur serveur : ${response.status}`);
     }
     const data = await response.json();
-    if(data.error){
+    if (data.error) {
       document.getElementById("resultatNom").innerHTML = `<p style="color:red;">${data.error}</p>`;
       return;
     }
@@ -64,7 +64,7 @@ async function chercherParElements() {
   });
 
   try {
-    const response = await fetch("http://localhost:5000/predict_elements", {
+    const response = await fetch("/predict_elements", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -92,10 +92,8 @@ async function chercherParElements() {
         ${Object.entries(resultats.composition_moyenne).map(([elem, val]) => `<li>${elem} : ${val} %</li>`).join('')}
       </ul>
     `;
-
   } catch (err) {
     console.error("Erreur lors de la requête :", err);
     document.getElementById("resultatElements").innerHTML = `<p style="color:red;">Erreur lors de la requête : ${err.message}</p>`;
   }
 }
-
