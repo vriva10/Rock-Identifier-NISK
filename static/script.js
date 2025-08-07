@@ -10,7 +10,6 @@ function afficherRechercheParElements() {
   document.getElementById("accueil").classList.add("hidden");
   document.getElementById("recherche-elements").classList.remove("hidden");
 
-  // Créer les champs pour chaque élément
   const container = document.getElementById("elements-inputs");
   container.innerHTML = '';
   elements.forEach(elem => {
@@ -21,7 +20,6 @@ function afficherRechercheParElements() {
   });
 }
 
-// Recherche par nom : appelle l'API Flask et affiche la composition moyenne
 async function chercherParNom() {
   const nom = document.getElementById("nomRoche").value.trim().toLowerCase();
   if (!nom) {
@@ -30,15 +28,16 @@ async function chercherParNom() {
   }
 
   try {
-    const response = await fetch(`/composition/${nom}`);
-    if (!response.ok) {
-      throw new Error(`Erreur serveur : ${response.status}`);
-    }
+    const response = await fetch(`/composition/${encodeURIComponent(nom)}`);
+    if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
+
     const data = await response.json();
+
     if (data.error) {
       document.getElementById("resultatNom").innerHTML = `<p style="color:red;">${data.error}</p>`;
       return;
     }
+
     const comp = data.composition_moyenne;
     let html = `<h3>Composition moyenne pour ${data.roche} :</h3><ul>`;
     for (const [elem, val] of Object.entries(comp)) {
@@ -46,22 +45,29 @@ async function chercherParNom() {
     }
     html += `</ul>`;
     document.getElementById("resultatNom").innerHTML = html;
+
   } catch (err) {
     document.getElementById("resultatNom").innerHTML = `<p style="color:red;">Erreur lors de la requête : ${err.message}</p>`;
   }
 }
 
-// Recherche par éléments : appelle l'API Flask /predict_elements et affiche les résultats
 async function chercherParElements() {
   const form = document.getElementById("form-elements");
   const formData = new FormData(form);
   const payload = {};
 
-  // Construire le dictionnaire des valeurs entrées (mettre 0 si vide)
+  // Inclure uniquement les éléments renseignés
   elements.forEach(elem => {
     const value = formData.get(elem);
-    payload[elem] = value ? parseFloat(value) : 0;
+    if (value !== null && value !== '') {
+      payload[elem] = parseFloat(value);
+    }
   });
+
+  if (Object.keys(payload).length === 0) {
+    alert("Veuillez renseigner au moins un élément.");
+    return;
+  }
 
   try {
     const response = await fetch("/predict_elements", {
@@ -72,13 +78,11 @@ async function chercherParElements() {
       body: JSON.stringify(payload)
     });
 
-    if (!response.ok) {
-      throw new Error(`Erreur serveur: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Erreur serveur: ${response.status}`);
 
     const resultats = await response.json();
-
     const div = document.getElementById("resultatElements");
+
     if (!resultats || !resultats.roche) {
       div.innerHTML = `<p>Aucune roche correspondante trouvée.</p>`;
       return;
@@ -89,9 +93,12 @@ async function chercherParElements() {
       <p><strong>${resultats.roche}</strong> : ${resultats.probabilite} %</p>
       <h4>Composition moyenne :</h4>
       <ul>
-        ${Object.entries(resultats.composition_moyenne).map(([elem, val]) => `<li>${elem} : ${val} %</li>`).join('')}
+        ${Object.entries(resultats.composition_moyenne)
+          .map(([elem, val]) => `<li>${elem} : ${val} %</li>`)
+          .join('')}
       </ul>
     `;
+
   } catch (err) {
     console.error("Erreur lors de la requête :", err);
     document.getElementById("resultatElements").innerHTML = `<p style="color:red;">Erreur lors de la requête : ${err.message}</p>`;
