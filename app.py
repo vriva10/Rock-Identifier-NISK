@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask_cors import CORS
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 import os
 
 app = Flask(__name__)
+CORS(app)
 
 # Chargement des données
 df = pd.read_excel("rock_database_test2_NISK24.xlsx")
