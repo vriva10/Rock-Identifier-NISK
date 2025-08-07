@@ -40,7 +40,6 @@ def index():
 def static_proxy(path):
     return send_from_directory("static", path)
 
-# API : prédiction à partir des éléments
 @app.route("/predict_elements", methods=["POST"])
 def predict_elements():
     data = request.json
@@ -48,11 +47,25 @@ def predict_elements():
         return jsonify({"error": "Aucune donnée reçue"}), 400
 
     try:
-        # Remplir les valeurs manquantes avec 0
-        input_values = [float(data.get(elem, 0)) for elem in features]
-        scaled_input = scaler.transform([input_values])
-        prediction = model.predict(scaled_input)[0]
-        proba = model.predict_proba(scaled_input).max()
+        # Garder uniquement les éléments renseignés par l'utilisateur
+        valid_elements = [elem for elem in features if elem in data]
+
+        if not valid_elements:
+            return jsonify({"error": "Aucun élément renseigné pour la prédiction."}), 400
+
+        input_values = [data[elem] for elem in valid_elements]
+
+        # Sélectionner uniquement les colonnes correspondantes dans le dataset pour scaler et prédire
+        X_partial = df[valid_elements]
+        scaler_partial = StandardScaler().fit(X_partial)
+        scaled_input = scaler_partial.transform([input_values])
+
+        # Reentraîner un modèle sur ces colonnes uniquement
+        model_partial = RandomForestClassifier(n_estimators=100, random_state=42)
+        model_partial.fit(scaler_partial.transform(X_partial), df["Roche"])
+
+        prediction = model_partial.predict(scaled_input)[0]
+        proba = model_partial.predict_proba(scaled_input).max()
 
         # Calcul des moyennes pour la roche prédite
         subset = df[df['Roche'] == prediction]
@@ -63,8 +76,10 @@ def predict_elements():
             "probabilite": round(proba * 100, 2),
             "composition_moyenne": {k: round(v, 2) for k, v in mean_comp.items()}
         })
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 # API : moyenne des éléments pour une roche donnée
 @app.route("/composition/<nom>")
