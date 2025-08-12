@@ -44,14 +44,14 @@ def static_proxy(path):
 def predict_elements():
     data = request.json
     if not data:
-        return jsonify({"error": "Aucune donnée reçue"}), 400
+        return jsonify({"error": "Missing datas"}), 400
 
     try:
         # Garder uniquement les éléments renseignés par l'utilisateur
         valid_elements = [elem for elem in features if elem in data]
 
         if not valid_elements:
-            return jsonify({"error": "Aucun élément renseigné pour la prédiction."}), 400
+            return jsonify({"error": "No element entered for prediction."}), 400
 
         input_values = [data[elem] for elem in valid_elements]
 
@@ -88,7 +88,7 @@ def composition_par_nom(nom):
     subset = df[df['Roche'] == nom]
 
     if subset.empty:
-        return jsonify({"error": f"Aucune donnée trouvée pour la roche : {nom}"}), 404
+        return jsonify({"error": f"No data found for this rock : {nom}"}), 404
 
     mean_comp = subset[features].mean().to_dict()
 
