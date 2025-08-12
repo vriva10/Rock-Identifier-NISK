@@ -3,35 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Identification des Roches</title>
+  <title>NISK rock identification</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header>
-    <h1>Identification des Roches</h1>
+    <h1>NISK rock identification</h1>
   </header>
 
   <main>
     <div id="accueil">
-      <h2>Choisissez un mode de recherche</h2>
-      <button onclick="afficherRechercheParNom()">Recherche par nom</button>
-      <button onclick="afficherRechercheParElements()">Recherche par éléments</button>
+      <h2>Research mode</h2>
+      <button onclick="afficherRechercheParNom()">Research by Rock Name</button>
+      <button onclick="afficherRechercheParElements()">Research by elements</button>
     </div>
 
     <div id="recherche-nom" class="hidden">
-      <h2>Recherche par nom</h2>
+      <h2>Research by Rock Name</h2>
       <div class="form-group">
-        <input type="text" id="nomRoche" placeholder="Entrez le nom de la roche...">
+        <input type="text" id="nomRoche" placeholder="Enter name of rock...">
       </div>
       <button onclick="chercherParNom()">Chercher</button>
       <div id="resultatNom"></div>
     </div>
 
     <div id="recherche-elements" class="hidden">
-      <h2>Recherche par éléments</h2>
+      <h2>Research by elements</h2>
       <form id="form-elements">
         <div id="elements-inputs"></div>
-        <button type="button" onclick="chercherParElements()">Identifier</button>
+        <button type="button" onclick="chercherParElements()">Identify</button>
       </form>
       <div id="resultatElements"></div>
     </div>
@@ -40,4 +40,5 @@
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
+
 
