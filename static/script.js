@@ -23,7 +23,7 @@ function afficherRechercheParElements() {
 async function chercherParNom() {
   const nom = document.getElementById("nomRoche").value.trim().toLowerCase();
   if (!nom) {
-    alert("Veuillez entrer un nom de roche.");
+    alert("Enter rock name.");
     return;
   }
 
@@ -39,7 +39,7 @@ async function chercherParNom() {
     }
 
     const comp = data.composition_moyenne;
-    let html = `<h3>Composition moyenne pour ${data.roche} :</h3><ul>`;
+    let html = `<h3>Mean composition for ${data.roche} :</h3><ul>`;
     for (const [elem, val] of Object.entries(comp)) {
       html += `<li>${elem} : ${val} %</li>`;
     }
@@ -65,7 +65,7 @@ async function chercherParElements() {
   });
 
   if (Object.keys(payload).length === 0) {
-    alert("Veuillez renseigner au moins un élément.");
+    alert("Enter at least 1 element.");
     return;
   }
 
@@ -84,14 +84,14 @@ async function chercherParElements() {
     const div = document.getElementById("resultatElements");
 
     if (!resultats || !resultats.roche) {
-      div.innerHTML = `<p>Aucune roche correspondante trouvée.</p>`;
+      div.innerHTML = `<p>No corresponding rock found.</p>`;
       return;
     }
 
     div.innerHTML = `
-      <h3>Roche la plus probable :</h3>
+      <h3>Most probable rock :</h3>
       <p><strong>${resultats.roche}</strong> : ${resultats.probabilite} %</p>
-      <h4>Composition moyenne :</h4>
+      <h4>Mean composition :</h4>
       <ul>
         ${Object.entries(resultats.composition_moyenne)
           .map(([elem, val]) => `<li>${elem} : ${val} %</li>`)
@@ -100,7 +100,7 @@ async function chercherParElements() {
     `;
 
   } catch (err) {
-    console.error("Erreur lors de la requête :", err);
+    console.error("Error during request :", err);
     document.getElementById("resultatElements").innerHTML = `<p style="color:red;">Erreur lors de la requête : ${err.message}</p>`;
   }
 }
