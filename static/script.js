@@ -11,7 +11,7 @@ function afficherRechercheParNom() {
   document.getElementById("accueil").classList.add("hidden");
   document.getElementById("recherche-nom").classList.remove("hidden");
 
-  // Ajouter bouton retour
+  // Ajouter bouton retour si pas déjà présent
   if (!document.getElementById("btnRetourNom")) {
     const btnRetour = document.createElement("button");
     btnRetour.id = "btnRetourNom";
@@ -25,7 +25,7 @@ function afficherRechercheParElements() {
   document.getElementById("accueil").classList.add("hidden");
   document.getElementById("recherche-elements").classList.remove("hidden");
 
-  // Ajouter bouton retour
+  // Ajouter bouton retour si pas déjà présent
   if (!document.getElementById("btnRetourElements")) {
     const btnRetour = document.createElement("button");
     btnRetour.id = "btnRetourElements";
@@ -63,9 +63,9 @@ async function chercherParNom() {
       return;
     }
 
-    // Trier les éléments par ordre alphabétique
+    // Trier par valeur décroissante
     const compEntries = Object.entries(data.composition_moyenne)
-      .sort(([a], [b]) => a.localeCompare(b));
+      .sort(([, valA], [, valB]) => valB - valA);
 
     let html = `<h3>Composition moyenne pour ${data.roche} :</h3><ul>`;
     compEntries.forEach(([elem, val]) => {
@@ -116,9 +116,9 @@ async function chercherParElements() {
       return;
     }
 
-    // Trier la composition moyenne affichée
+    // Trier par valeur décroissante
     const compEntries = Object.entries(resultats.composition_moyenne)
-      .sort(([a], [b]) => a.localeCompare(b));
+      .sort(([, valA], [, valB]) => valB - valA);
 
     div.innerHTML = `
       <h3>Roche la plus probable :</h3>
