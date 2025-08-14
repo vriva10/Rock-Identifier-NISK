@@ -1,15 +1,40 @@
 // Liste des éléments à afficher dans le formulaire
 const elements = ['Mg', 'Al', 'Si', 'P', 'S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Ag', 'Ba', 'Ce', 'Au'];
 
+function afficherAccueil() {
+  document.getElementById("accueil").classList.remove("hidden");
+  document.getElementById("recherche-nom").classList.add("hidden");
+  document.getElementById("recherche-elements").classList.add("hidden");
+}
+
 function afficherRechercheParNom() {
   document.getElementById("accueil").classList.add("hidden");
   document.getElementById("recherche-nom").classList.remove("hidden");
+
+  // Ajouter bouton retour
+  if (!document.getElementById("btnRetourNom")) {
+    const btnRetour = document.createElement("button");
+    btnRetour.id = "btnRetourNom";
+    btnRetour.textContent = "⬅ Retour";
+    btnRetour.onclick = afficherAccueil;
+    document.getElementById("recherche-nom").prepend(btnRetour);
+  }
 }
 
 function afficherRechercheParElements() {
   document.getElementById("accueil").classList.add("hidden");
   document.getElementById("recherche-elements").classList.remove("hidden");
 
+  // Ajouter bouton retour
+  if (!document.getElementById("btnRetourElements")) {
+    const btnRetour = document.createElement("button");
+    btnRetour.id = "btnRetourElements";
+    btnRetour.textContent = "⬅ Retour";
+    btnRetour.onclick = afficherAccueil;
+    document.getElementById("recherche-elements").prepend(btnRetour);
+  }
+
+  // Créer les champs pour chaque élément
   const container = document.getElementById("elements-inputs");
   container.innerHTML = '';
   elements.forEach(elem => {
@@ -23,7 +48,7 @@ function afficherRechercheParElements() {
 async function chercherParNom() {
   const nom = document.getElementById("nomRoche").value.trim().toLowerCase();
   if (!nom) {
-    alert("Enter rock name.");
+    alert("Veuillez entrer un nom de roche.");
     return;
   }
 
@@ -38,11 +63,14 @@ async function chercherParNom() {
       return;
     }
 
-    const comp = data.composition_moyenne;
-    let html = `<h3>Mean composition for ${data.roche} :</h3><ul>`;
-    for (const [elem, val] of Object.entries(comp)) {
+    // Trier les éléments par ordre alphabétique
+    const compEntries = Object.entries(data.composition_moyenne)
+      .sort(([a], [b]) => a.localeCompare(b));
+
+    let html = `<h3>Composition moyenne pour ${data.roche} :</h3><ul>`;
+    compEntries.forEach(([elem, val]) => {
       html += `<li>${elem} : ${val} %</li>`;
-    }
+    });
     html += `</ul>`;
     document.getElementById("resultatNom").innerHTML = html;
 
@@ -65,7 +93,7 @@ async function chercherParElements() {
   });
 
   if (Object.keys(payload).length === 0) {
-    alert("Enter at least 1 element.");
+    alert("Veuillez renseigner au moins un élément.");
     return;
   }
 
@@ -84,23 +112,25 @@ async function chercherParElements() {
     const div = document.getElementById("resultatElements");
 
     if (!resultats || !resultats.roche) {
-      div.innerHTML = `<p>No corresponding rock found.</p>`;
+      div.innerHTML = `<p>Aucune roche correspondante trouvée.</p>`;
       return;
     }
 
+    // Trier la composition moyenne affichée
+    const compEntries = Object.entries(resultats.composition_moyenne)
+      .sort(([a], [b]) => a.localeCompare(b));
+
     div.innerHTML = `
-      <h3>Most probable rock :</h3>
+      <h3>Roche la plus probable :</h3>
       <p><strong>${resultats.roche}</strong> : ${resultats.probabilite} %</p>
-      <h4>Mean composition :</h4>
+      <h4>Composition moyenne :</h4>
       <ul>
-        ${Object.entries(resultats.composition_moyenne)
-          .map(([elem, val]) => `<li>${elem} : ${val} %</li>`)
-          .join('')}
+        ${compEntries.map(([elem, val]) => `<li>${elem} : ${val} %</li>`).join('')}
       </ul>
     `;
 
   } catch (err) {
-    console.error("Error during request :", err);
+    console.error("Erreur lors de la requête :", err);
     document.getElementById("resultatElements").innerHTML = `<p style="color:red;">Erreur lors de la requête : ${err.message}</p>`;
   }
 }
