@@ -37,6 +37,7 @@ function afficherRechercheParElements() {
   // Créer les champs pour chaque élément
   const container = document.getElementById("elements-inputs");
   container.innerHTML = '';
+  container.classList.add("grid-elements"); // <-- nouvelle classe CSS
   elements.forEach(elem => {
     const div = document.createElement('div');
     div.classList.add('form-group');
