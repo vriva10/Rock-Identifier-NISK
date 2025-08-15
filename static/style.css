@@ -12,7 +12,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 2rem;
   color: #102a43;
 }
@@ -30,7 +30,7 @@ h1, h2, h3 {
   padding: 2rem 2.5rem;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  max-width: 600px;
+  max-width: 900px; /* ⬅ élargi pour plus de colonnes */
   width: 100%;
 }
 
@@ -99,11 +99,18 @@ a:hover {
 /* Disposition des champs d'éléments en colonnes */
 .grid-elements {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* plus large que 120px */
+  gap: 15px;
+  margin-top: 1rem;
 }
 
 .grid-elements .form-group {
   display: flex;
   flex-direction: column;
+}
+
+.grid-elements label {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: #243b53;
 }
