@@ -1,45 +1,40 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NISK rock identification</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <title>Recherche de roches</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <header>
-    <h1>NISK rock identification</h1>
-  </header>
+  <!-- Page d'accueil -->
+  <div id="accueil" class="container page">
+    <h1>Recherche de roches</h1>
+    <button onclick="afficherRechercheParNom()">🔍 Recherche par nom</button>
+    <button onclick="afficherRechercheParElements()">🧪 Recherche par éléments</button>
+  </div>
 
-  <main>
-    <div id="accueil">
-      <h2>Research mode</h2>
-      <button onclick="afficherRechercheParNom()">Research by Rock Name</button>
-      <button onclick="afficherRechercheParElements()">Research by elements</button>
-    </div>
+  <!-- Page recherche par nom -->
+  <div id="recherche-nom" class="container page hidden">
+    <h2>Recherche par nom</h2>
+    <input type="text" id="nomRoche" placeholder="Nom de la roche">
+    <button onclick="chercherParNom()">Rechercher</button>
+    <button onclick="retourAccueil()">⬅ Retour</button>
+    <div id="resultatNom" class="result"></div>
+  </div>
 
-    <div id="recherche-nom" class="hidden">
-      <h2>Research by Rock Name</h2>
-      <div class="form-group">
-        <input type="text" id="nomRoche" placeholder="Enter name of rock...">
+  <!-- Page recherche par éléments -->
+  <div id="recherche-elements" class="container page hidden">
+    <h2>Recherche par éléments</h2>
+    <form id="form-elements" onsubmit="event.preventDefault(); chercherParElements();">
+      <div id="elements-inputs" class="grid-elements">
+        <!-- Les champs sont générés par JS -->
       </div>
-      <button onclick="chercherParNom()">Search</button>
-      <div id="resultatNom"></div>
-    </div>
+      <button type="submit">Rechercher</button>
+      <button type="button" onclick="retourAccueil()">⬅ Retour</button>
+    </form>
+    <div id="resultatElements" class="result"></div>
+  </div>
 
-    <div id="recherche-elements" class="hidden">
-      <h2>Research by elements</h2>
-      <form id="form-elements">
-        <div id="elements-inputs"></div>
-        <button type="button" onclick="chercherParElements()">Identify</button>
-      </form>
-      <div id="resultatElements"></div>
-    </div>
-  </main>
-
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="/static/script.js"></script>
 </body>
 </html>
-
-
-
