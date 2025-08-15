@@ -2,13 +2,13 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Recherche de roches</title>
+  <title>NISK rock identification 2025</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <!-- Page d'accueil -->
   <div id="accueil" class="container page">
-    <h1>Recherche de roches</h1>
+    <h1>NISK rock identification 2025</h1>
     <button onclick="afficherRechercheParNom()">Search by name</button>
     <button onclick="afficherRechercheParElements()">Search by elements</button>
   </div>
@@ -17,8 +17,8 @@
   <div id="recherche-nom" class="container page hidden">
     <h2>Search by name</h2>
     <input type="text" id="nomRoche" placeholder="Nom de la roche">
-    <button onclick="chercherParNom()">Rechercher</button>
-    <button onclick="retourAccueil()">⬅ Retour</button>
+    <button onclick="chercherParNom()">Search</button>
+    <button onclick="retourAccueil()">⬅ Return</button>
     <div id="resultatNom" class="result"></div>
   </div>
 
@@ -29,8 +29,8 @@
       <div id="elements-inputs" class="grid-elements">
         <!-- Les champs sont générés par JS -->
       </div>
-      <button type="submit">Rechercher</button>
-      <button type="button" onclick="retourAccueil()">⬅ Retour</button>
+      <button type="submit">Search</button>
+      <button type="button" onclick="retourAccueil()">⬅ Return</button>
     </form>
     <div id="resultatElements" class="result"></div>
   </div>
@@ -38,4 +38,5 @@
   <script src="/static/script.js"></script>
 </body>
 </html>
+
 
