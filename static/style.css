@@ -95,3 +95,15 @@ a:hover {
 .hidden {
   display: none;
 }
+
+/* Disposition des champs d'éléments en colonnes */
+.grid-elements {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.grid-elements .form-group {
+  display: flex;
+  flex-direction: column;
+}
