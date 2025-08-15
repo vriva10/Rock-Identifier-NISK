@@ -1,43 +1,21 @@
 // Liste des éléments à afficher dans le formulaire
 const elements = ['Mg', 'Al', 'Si', 'P', 'S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Ag', 'Ba', 'Ce', 'Au'];
 
-function afficherAccueil() {
-  document.getElementById("accueil").classList.remove("hidden");
-  document.getElementById("recherche-nom").classList.add("hidden");
-  document.getElementById("recherche-elements").classList.add("hidden");
-}
-
+// Afficher recherche par nom
 function afficherRechercheParNom() {
   document.getElementById("accueil").classList.add("hidden");
   document.getElementById("recherche-nom").classList.remove("hidden");
-
-  // Ajouter bouton retour si pas déjà présent
-  if (!document.getElementById("btnRetourNom")) {
-    const btnRetour = document.createElement("button");
-    btnRetour.id = "btnRetourNom";
-    btnRetour.textContent = "⬅ Retour";
-    btnRetour.onclick = afficherAccueil;
-    document.getElementById("recherche-nom").prepend(btnRetour);
-  }
 }
 
+// Afficher recherche par éléments avec grille
 function afficherRechercheParElements() {
   document.getElementById("accueil").classList.add("hidden");
   document.getElementById("recherche-elements").classList.remove("hidden");
 
-  // Ajouter bouton retour si pas déjà présent
-  if (!document.getElementById("btnRetourElements")) {
-    const btnRetour = document.createElement("button");
-    btnRetour.id = "btnRetourElements";
-    btnRetour.textContent = "⬅ Retour";
-    btnRetour.onclick = afficherAccueil;
-    document.getElementById("recherche-elements").prepend(btnRetour);
-  }
-
-  // Créer les champs pour chaque élément
   const container = document.getElementById("elements-inputs");
+  container.classList.add("grid-elements"); // ✅ Ajout de la classe grille
   container.innerHTML = '';
-  container.classList.add("grid-elements"); // <-- nouvelle classe CSS
+
   elements.forEach(elem => {
     const div = document.createElement('div');
     div.classList.add('form-group');
@@ -46,6 +24,13 @@ function afficherRechercheParElements() {
   });
 }
 
+// Retour au menu principal
+function retourAccueil() {
+  document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
+  document.getElementById("accueil").classList.remove("hidden");
+}
+
+// Recherche par nom
 async function chercherParNom() {
   const nom = document.getElementById("nomRoche").value.trim().toLowerCase();
   if (!nom) {
@@ -54,49 +39,44 @@ async function chercherParNom() {
   }
 
   try {
-    const response = await fetch(`/composition/${encodeURIComponent(nom)}`);
-    if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
-
+    const response = await fetch(`/composition/${nom}`);
+    if (!response.ok) {
+      throw new Error(`Erreur serveur : ${response.status}`);
+    }
     const data = await response.json();
-
     if (data.error) {
       document.getElementById("resultatNom").innerHTML = `<p style="color:red;">${data.error}</p>`;
       return;
     }
 
-    // Trier par valeur décroissante
-    const compEntries = Object.entries(data.composition_moyenne)
-      .sort(([, valA], [, valB]) => valB - valA);
+    const comp = Object.entries(data.composition_moyenne)
+      .sort((a, b) => b[1] - a[1]); // ✅ tri numérique décroissant
 
     let html = `<h3>Composition moyenne pour ${data.roche} :</h3><ul>`;
-    compEntries.forEach(([elem, val]) => {
+    for (const [elem, val] of comp) {
       html += `<li>${elem} : ${val} %</li>`;
-    });
+    }
     html += `</ul>`;
-    document.getElementById("resultatNom").innerHTML = html;
 
+    document.getElementById("resultatNom").innerHTML = html;
   } catch (err) {
     document.getElementById("resultatNom").innerHTML = `<p style="color:red;">Erreur lors de la requête : ${err.message}</p>`;
   }
 }
 
+// Recherche par éléments
 async function chercherParElements() {
   const form = document.getElementById("form-elements");
   const formData = new FormData(form);
   const payload = {};
 
-  // Inclure uniquement les éléments renseignés
+  // Prend en compte seulement les valeurs renseignées
   elements.forEach(elem => {
     const value = formData.get(elem);
-    if (value !== null && value !== '') {
+    if (value !== null && value.trim() !== "") {
       payload[elem] = parseFloat(value);
     }
   });
-
-  if (Object.keys(payload).length === 0) {
-    alert("Veuillez renseigner au moins un élément.");
-    return;
-  }
 
   try {
     const response = await fetch("/predict_elements", {
@@ -107,7 +87,9 @@ async function chercherParElements() {
       body: JSON.stringify(payload)
     });
 
-    if (!response.ok) throw new Error(`Erreur serveur: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`Erreur serveur: ${response.status}`);
+    }
 
     const resultats = await response.json();
     const div = document.getElementById("resultatElements");
@@ -117,19 +99,17 @@ async function chercherParElements() {
       return;
     }
 
-    // Trier par valeur décroissante
-    const compEntries = Object.entries(resultats.composition_moyenne)
-      .sort(([, valA], [, valB]) => valB - valA);
+    const comp = Object.entries(resultats.composition_moyenne)
+      .sort((a, b) => b[1] - a[1]); // ✅ tri numérique décroissant
 
     div.innerHTML = `
       <h3>Roche la plus probable :</h3>
       <p><strong>${resultats.roche}</strong> : ${resultats.probabilite} %</p>
       <h4>Composition moyenne :</h4>
       <ul>
-        ${compEntries.map(([elem, val]) => `<li>${elem} : ${val} %</li>`).join('')}
+        ${comp.map(([elem, val]) => `<li>${elem} : ${val} %</li>`).join('')}
       </ul>
     `;
-
   } catch (err) {
     console.error("Erreur lors de la requête :", err);
     document.getElementById("resultatElements").innerHTML = `<p style="color:red;">Erreur lors de la requête : ${err.message}</p>`;
