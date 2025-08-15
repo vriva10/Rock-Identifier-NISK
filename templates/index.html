@@ -9,13 +9,13 @@
   <!-- Page d'accueil -->
   <div id="accueil" class="container page">
     <h1>Recherche de roches</h1>
-    <button onclick="afficherRechercheParNom()">🔍 Recherche par nom</button>
-    <button onclick="afficherRechercheParElements()">🧪 Recherche par éléments</button>
+    <button onclick="afficherRechercheParNom()">Search by name</button>
+    <button onclick="afficherRechercheParElements()">Search by elements</button>
   </div>
 
   <!-- Page recherche par nom -->
   <div id="recherche-nom" class="container page hidden">
-    <h2>Recherche par nom</h2>
+    <h2>Search by name</h2>
     <input type="text" id="nomRoche" placeholder="Nom de la roche">
     <button onclick="chercherParNom()">Rechercher</button>
     <button onclick="retourAccueil()">⬅ Retour</button>
@@ -24,7 +24,7 @@
 
   <!-- Page recherche par éléments -->
   <div id="recherche-elements" class="container page hidden">
-    <h2>Recherche par éléments</h2>
+    <h2>Search by elements</h2>
     <form id="form-elements" onsubmit="event.preventDefault(); chercherParElements();">
       <div id="elements-inputs" class="grid-elements">
         <!-- Les champs sont générés par JS -->
@@ -38,3 +38,4 @@
   <script src="/static/script.js"></script>
 </body>
 </html>
+
