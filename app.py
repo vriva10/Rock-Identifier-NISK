@@ -18,7 +18,8 @@ df['Roche'] = df['Roche'].str.strip().str.lower()
 df.dropna(inplace=True)
 
 # Séparation des features et de la cible
-features = ['Mg', 'Al', 'Si', 'P', 'S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Ag', 'Ba', 'Ce', 'Au']
+features = ['Mg', 'Al', 'Si', 'P', 'S', 'K', 'Ca', 'Ti', 'V', 'Cr', 
+            'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'As', 'Ag', 'Ba', 'Ce', 'Au']
 X = df[features]
 y = df['Roche']
 
@@ -26,7 +27,7 @@ y = df['Roche']
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# Entraînement du modèle
+# Entraînement du modèle global
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_scaled, y)
 
@@ -40,6 +41,7 @@ def index():
 def static_proxy(path):
     return send_from_directory("static", path)
 
+# API : prédiction à partir des éléments
 @app.route("/predict_elements", methods=["POST"])
 def predict_elements():
     data = request.json
@@ -55,31 +57,42 @@ def predict_elements():
 
         input_values = [data[elem] for elem in valid_elements]
 
-        # Sélectionner uniquement les colonnes correspondantes dans le dataset pour scaler et prédire
+        # Sélectionner uniquement les colonnes correspondantes dans le dataset
         X_partial = df[valid_elements]
         scaler_partial = StandardScaler().fit(X_partial)
         scaled_input = scaler_partial.transform([input_values])
 
-        # Reentraîner un modèle sur ces colonnes uniquement
+        # Réentraîner un modèle sur ces colonnes uniquement
         model_partial = RandomForestClassifier(n_estimators=100, random_state=42)
         model_partial.fit(scaler_partial.transform(X_partial), df["Roche"])
 
-        prediction = model_partial.predict(scaled_input)[0]
-        proba = model_partial.predict_proba(scaled_input).max()
+        # Obtenir toutes les probabilités
+        probabilities = model_partial.predict_proba(scaled_input)[0]
 
-        # Calcul des moyennes pour la roche prédite
-        subset = df[df['Roche'] == prediction]
-        mean_comp = subset[features].mean().to_dict()
+        # Associer classes ↔ probas
+        class_probs = list(zip(model_partial.classes_, probabilities))
 
-        return jsonify({
-            "roche": prediction,
-            "probabilite": round(proba * 100, 2),
-            "composition_moyenne": {k: round(v, 2) for k, v in mean_comp.items()}
-        })
+        # Trier par proba décroissante
+        class_probs = sorted(class_probs, key=lambda x: x[1], reverse=True)
+
+        # Prendre le top 5
+        top5 = [(rock, round(prob * 100, 2)) for rock, prob in class_probs[:5]]
+
+        # Ajouter les compositions moyennes pour ces 5 roches
+        results = []
+        for rock, prob in top5:
+            subset = df[df['Roche'] == rock]
+            mean_comp = subset[features].mean().to_dict()
+            results.append({
+                "roche": rock,
+                "probabilite": prob,
+                "composition_moyenne": {k: round(v, 2) for k, v in mean_comp.items()}
+            })
+
+        return jsonify({"predictions": results})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 # API : moyenne des éléments pour une roche donnée
 @app.route("/composition/<nom>")
